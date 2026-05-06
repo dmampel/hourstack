@@ -14,7 +14,7 @@ export function exportSessionsToCSV(
 
   const rows = sessions.map((session) => {
     const project = projectMap.get(session.projectId);
-    const durationHours = session.duration / 60;
+    const durationHours = session.duration / 3600;
 
     return {
       Project: project?.name ?? 'Unknown',

@@ -1,8 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { Link as LinkIcon, Plus, Trash2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { Resource } from '@/types';
+import Card from '@/components/ui/Card';
+import IconButton from '@/components/ui/IconButton';
+import Button from '@/components/ui/Button';
 
 interface ResourcesSectionProps {
   projectId: string;
@@ -20,103 +24,93 @@ export function ResourcesSection({ projectId, resources }: ResourcesSectionProps
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!label || !url) return;
-
-    // Ensure URL has protocol
     const fullUrl = url.startsWith('http') ? url : `https://${url}`;
-
     addResource(projectId, { label, url: fullUrl });
     setLabel('');
     setUrl('');
     setIsAdding(false);
   };
 
+  const inputClass =
+    'mt-1 w-full rounded-[var(--radius-md)] border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)] outline-none transition-all focus:border-[var(--color-grape)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-grape)_15%,transparent)]';
+
   return (
-    <div className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">Resources</h3>
+    <Card padding="md">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Resources</h3>
         {!isAdding && (
-          <button 
-            onClick={() => setIsAdding(true)}
-            className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
-          >
-            Add Link
-          </button>
+          <IconButton aria-label="Add resource" size="sm" onClick={() => setIsAdding(true)}>
+            <Plus size={16} />
+          </IconButton>
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {resources.length === 0 && !isAdding && (
-          <p className="text-xs text-zinc-400 py-4 text-center italic">No resources added yet.</p>
+          <p className="py-4 text-center text-xs italic text-[var(--color-ink-soft)]">
+            No resources added yet.
+          </p>
         )}
 
-        {resources.map((resource) => (
-          <div key={resource.id} className="group flex items-center justify-between rounded-lg border border-zinc-50 bg-zinc-50/50 p-3 transition-all hover:border-zinc-200 hover:bg-zinc-50">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm text-zinc-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-bold text-zinc-700">{resource.label}</p>
-                <a 
-                  href={resource.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="truncate text-[10px] text-zinc-400 hover:text-indigo-500 hover:underline block"
-                >
-                  {resource.url.replace(/^https?:\/\//, '')}
-                </a>
-              </div>
+        {/* Resource chips */}
+        <div className="flex flex-wrap gap-2">
+          {resources.map((resource) => (
+            <div key={resource.id} className="group flex items-center gap-1.5">
+              <a
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-muted)] px-3 py-1.5 text-xs font-medium text-[var(--color-ink)] transition-all hover:border-[var(--color-grape)] hover:bg-[color-mix(in_srgb,var(--color-grape)_8%,var(--color-surface))] hover:text-[var(--color-grape)]"
+              >
+                <LinkIcon size={12} className="flex-shrink-0" />
+                <span className="truncate max-w-[140px]">{resource.label}</span>
+              </a>
+              <button
+                onClick={() => removeResource(projectId, resource.id)}
+                aria-label={`Remove resource ${resource.label}`}
+                className="flex h-5 w-5 items-center justify-center rounded-full text-[var(--color-line)] opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+              >
+                <Trash2 size={10} />
+              </button>
             </div>
-            <button 
-              onClick={() => removeResource(projectId, resource.id)}
-              className="ml-2 h-6 w-6 items-center justify-center rounded-full text-zinc-300 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all flex"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
 
+        {/* Add form */}
         {isAdding && (
-          <form onSubmit={handleSubmit} className="mt-4 space-y-3 border-t border-zinc-100 pt-4">
+          <form onSubmit={handleSubmit} className="mt-4 space-y-3 border-t border-[var(--color-line)] pt-4">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Label</label>
-              <input 
-                type="text" 
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">Label</label>
+              <input
+                type="text"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="e.g. GitHub Repo"
                 autoFocus
-                className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">URL</label>
-              <input 
-                type="text" 
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">URL</label>
+              <input
+                type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="github.com/..."
-                className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                className={inputClass}
               />
             </div>
             <div className="flex gap-2 pt-1">
-              <button 
-                type="submit"
-                className="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-700 transition-colors"
-              >
-                Save Resource
-              </button>
-              <button 
-                type="button"
-                onClick={() => setIsAdding(false)}
-                className="rounded-lg bg-zinc-100 px-3 py-2 text-xs font-bold text-zinc-600 hover:bg-zinc-200 transition-colors"
-              >
+              <Button type="submit" variant="primary" size="sm" className="flex-1">
+                Save
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setIsAdding(false)}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

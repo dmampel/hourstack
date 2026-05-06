@@ -1,21 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { Play, Pause, Square } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-
-// Formats elapsed seconds as Xh Ym Zs
-function formatElapsed(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  
-  const parts = [];
-  if (h > 0) parts.push(`${h}h`);
-  if (m > 0 || h > 0) parts.push(`${m}m`);
-  parts.push(`${s}s`);
-  
-  return parts.join(' ');
-}
+import { formatDuration } from '@/lib/utils';
+import Button from '@/components/ui/Button';
 
 const EIGHT_HOURS_IN_SECONDS = 8 * 60 * 60;
 
@@ -34,7 +23,6 @@ export default function Timer() {
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Tick every second while timer is active
   useEffect(() => {
     if (!activeTimer) {
       setElapsed(0);
@@ -102,121 +90,123 @@ export default function Timer() {
   const isOverEightHours = elapsed >= EIGHT_HOURS_IN_SECONDS;
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-semibold text-zinc-800">Timer</h2>
+    <div className="flex flex-col rounded-[var(--radius-lg)] overflow-hidden" style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-grape) 8%, white), color-mix(in srgb, var(--color-blush) 6%, white))' }}>
+      <div className="flex flex-col gap-3 p-4">
 
-      {/* Active timer display */}
-      {activeTimer ? (
-        <div className="space-y-4">
-          {/* Elapsed time */}
-          <div className="flex flex-col items-center gap-1 rounded-xl bg-indigo-50 px-6 py-5">
-            <span
-              className={`font-mono text-5xl font-bold tracking-tight ${
-                isOverEightHours ? 'text-red-500' : 'text-indigo-600'
-              }`}
-            >
-              {formatElapsed(elapsed)}
-            </span>
-            {activeProject && (
-              <span className="mt-1 text-sm font-medium text-zinc-500">
-                {activeProject.name}
-                {activeProject.client ? ` — ${activeProject.client}` : ''}
+        {activeTimer ? (
+          <>
+            {/* Elapsed — display */}
+            <div className="flex flex-col items-center gap-0.5 py-2">
+              <span className="font-[family-name:var(--font-fraunces)] tabular-nums text-2xl font-semibold leading-none text-[var(--color-grape)]">
+                {formatDuration(elapsed)}
               </span>
-            )}
-          </div>
-
-          {/* Over 8 hours warning */}
-          {isOverEightHours && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              <span className="font-semibold">Warning:</span> Timer has been running for over 8 hours. Did you forget to stop it?
+              {activeProject && (
+                <span className="text-xs font-medium text-[var(--color-ink-soft)] truncate max-w-full px-2 text-center">
+                  {activeProject.name}
+                </span>
+              )}
+              {isOverEightHours && (
+                <span className="text-xs font-medium text-red-500">Over 8h!</span>
+              )}
             </div>
-          )}
 
-          {/* Stop / Save flow */}
-          {isStopping ? (
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSave();
-                  if (e.key === 'Escape') handleCancelStop();
-                }}
-                placeholder="Description (optional)"
-                autoFocus
-                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-800 placeholder-zinc-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-              />
+            {isStopping ? (
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSave();
+                    if (e.key === 'Escape') handleCancelStop();
+                  }}
+                  placeholder="Description (optional)"
+                  autoFocus
+                  className="w-full rounded-[var(--radius-md)] border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2.5 text-sm text-[var(--color-ink)] placeholder-[var(--color-ink-soft)] outline-none focus:border-[var(--color-grape)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-grape)_15%,transparent)]"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSave}
+                    className="flex-1 rounded-[var(--radius-md)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    style={{ background: 'var(--gradient-brand)' }}
+                  >
+                    Save Session
+                  </button>
+                  <button
+                    onClick={handleCancelStop}
+                    className="rounded-[var(--radius-md)] border border-[var(--color-line)] px-4 py-2.5 text-sm font-medium text-[var(--color-ink-soft)] transition-colors hover:bg-[var(--color-surface-muted)]"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
               <div className="flex gap-2">
+                {activeTimer.startTime ? (
+                  <button
+                    onClick={pauseTimer}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-line)] bg-[var(--color-surface-muted)] px-4 py-2.5 text-sm font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-line)]"
+                  >
+                    <Pause size={16} /> Pause
+                  </button>
+                ) : (
+                  <button
+                    onClick={resumeTimer}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    style={{ background: 'var(--gradient-brand)' }}
+                  >
+                    <Play size={16} /> Resume
+                  </button>
+                )}
                 <button
-                  onClick={handleSave}
-                  className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 active:bg-indigo-800"
+                  onClick={handleStop}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-100"
                 >
-                  Save Session
-                </button>
-                <button
-                  onClick={handleCancelStop}
-                  className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50"
-                >
-                  Cancel
+                  <Square size={16} /> Stop
                 </button>
               </div>
+            )}
+          </>
+        ) : (
+          /* Idle */
+          <>
+            {/* Idle display */}
+            <div className="flex flex-col items-center gap-0.5 py-2">
+              <span className="font-[family-name:var(--font-fraunces)] tabular-nums text-2xl font-semibold leading-none text-[var(--color-grape)] opacity-30">
+                00:00:00
+              </span>
+              <span className="text-xs text-[var(--color-ink-soft)]">Stay focused, achieve more.</span>
             </div>
-          ) : (
-            <div className="flex gap-2">
-              {activeTimer.startTime ? (
-                <button
-                  onClick={pauseTimer}
-                  className="flex-1 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-700 transition-colors hover:bg-indigo-100 active:bg-indigo-200"
-                >
-                  Pause
-                </button>
-              ) : (
-                <button
-                  onClick={resumeTimer}
-                  className="flex-1 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 active:bg-emerald-700"
-                >
-                  Resume
-                </button>
-              )}
-              <button
-                onClick={handleStop}
-                className="flex-1 rounded-lg bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600 active:bg-red-700"
+
+            <div className="flex flex-col gap-3">
+              <select
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+                className="w-full rounded-[var(--radius-md)] border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-grape)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-grape)_15%,transparent)] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={projects.length === 0}
               >
-                Stop
+                <option value="">
+                  {projects.length === 0 ? 'No projects yet' : 'Select a project…'}
+                </option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}{p.client ? ` — ${p.client}` : ''}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={handleStart}
+                disabled={!selectedProjectId}
+                className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ background: 'var(--gradient-brand)' }}
+              >
+                <Play size={18} /> Start Timer
               </button>
             </div>
-          )}
-        </div>
-      ) : (
-        /* Idle — project selector + start button */
-        <div className="space-y-3">
-          <select
-            value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={projects.length === 0}
-          >
-            <option value="">
-              {projects.length === 0 ? 'No projects yet' : 'Select a project…'}
-            </option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-                {p.client ? ` — ${p.client}` : ''}
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={handleStart}
-            disabled={!selectedProjectId}
-            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 active:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Start Timer
-          </button>
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import { Project, Session, ActiveTimer } from '../types';
+import { Project, Session, ActiveTimer, Resource, Attachment } from '../types';
 import { calculateEarnings } from '../lib/utils';
 
 // ---------------------------------------------------------------------------

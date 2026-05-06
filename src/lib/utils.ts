@@ -1,6 +1,6 @@
 /**
- * Formats a duration in minutes to a human-readable string.
- * @example formatDuration(90) => "1h 30m"
+ * Formats a duration in seconds to a human-readable string.
+ * @example formatDuration(5400) => "1h 30m 0s"
  */
 export function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
