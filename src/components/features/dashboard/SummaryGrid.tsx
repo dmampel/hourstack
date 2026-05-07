@@ -4,6 +4,7 @@ import { Clock, CalendarDays, Trophy, BarChart3 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import { formatDuration, formatCurrency } from "@/lib/utils";
 import { isThisWeek, isThisMonth } from "date-fns";
+import Link from "next/link";
 
 interface ChipCardProps {
   label: string;
@@ -178,8 +179,9 @@ export default function SummaryGrid() {
             <div className="h-8 w-px bg-[var(--color-ink-softest)] mx-2" />
             <div className="flex -space-x-2 overflow-visible">
               {projects.map((p, i) => (
-                <div
+                <Link
                   key={p.id}
+                  href={`/projects/${p.id}`}
                   title={p.name}
                   className="group relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--color-surface)] shadow-sm transition-all hover:z-10 hover:scale-110 hover:-translate-y-1 cursor-pointer"
                   style={{
@@ -189,7 +191,7 @@ export default function SummaryGrid() {
                   }}
                 >
                   <span className="text-sm font-bold">{p.name.charAt(0)}</span>
-                </div>
+                </Link>
               ))}
               <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-[var(--color-ink-softest)] text-[var(--color-ink-soft)] hover:bg-[var(--color-ink-softest)] transition-colors cursor-pointer">
                 <span className="text-lg">+</span>

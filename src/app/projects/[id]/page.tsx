@@ -1,124 +1,146 @@
 'use client';
 
-import { use, useMemo } from 'react';
-import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { Clock, DollarSign, BarChart3, ArrowLeft, ExternalLink } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store/useAppStore';
 import { formatDuration, formatCurrency } from '@/lib/utils';
 import SessionList from '@/components/features/sessions/SessionList';
-import { ResourcesSection } from '@/components/features/projects/ResourcesSection';
+import ProjectResources from '@/components/features/projects/ProjectResources';
+import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import Badge, { currencyTone } from '@/components/ui/Badge';
 
-export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function ProjectDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
 
-  const projects = useAppStore((state) => state.projects);
-  const sessions = useAppStore((state) => state.sessions);
-
-  const project = projects.find((p) => p.id === id);
-  const projectSessions = useMemo(() => sessions.filter((s) => s.projectId === id), [sessions, id]);
-
-  const totalDuration = useMemo(() => projectSessions.reduce((sum, s) => sum + s.duration, 0), [projectSessions]);
-  const totalPaid = useMemo(() => projectSessions.filter((s) => s.isPaid).reduce((sum, s) => sum + s.earnings, 0), [projectSessions]);
-  const totalPending = useMemo(() => projectSessions.filter((s) => !s.isPaid).reduce((sum, s) => sum + s.earnings, 0), [projectSessions]);
+  const project = useAppStore(useShallow((state) => state.projects.find((p) => p.id === id)));
+  const sessions = useAppStore(useShallow((state) => state.sessions.filter((s) => s.projectId === id)));
 
   if (!project) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-        <h1 className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold text-[var(--color-ink)]">
-          Project not found
-        </h1>
-        <Link href="/dashboard" className="mt-4 text-[var(--color-grape)] hover:underline">
-          Back to Dashboard
-        </Link>
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-lg font-semibold text-[var(--color-ink)]">Project not found</p>
+        <Button variant="secondary" size="md" className="mt-4" onClick={() => router.push('/projects')}>
+          <ArrowLeft size={16} /> Back to Projects
+        </Button>
       </div>
     );
   }
 
-  const projectColor = project.color || '#7C5CFF';
+  // Stats
+  const totalSeconds = sessions.reduce((sum, s) => sum + s.duration, 0);
+  const totalEarnings = sessions.reduce((sum, s) => sum + s.earnings, 0);
+  const avgSessionSeconds = sessions.length > 0 ? Math.floor(totalSeconds / sessions.length) : 0;
+
+  const accentColor = project.color || 'var(--color-grape)';
+  const headerBg = `color-mix(in srgb, ${accentColor} 8%, var(--color-canvas))`;
 
   return (
-    <div className="space-y-8">
-      {/* Hero strip */}
-      <div
-        className="rounded-[var(--radius-xl)] px-8 py-8"
-        style={{
-          background: `color-mix(in srgb, ${projectColor} 14%, var(--color-surface))`,
-        }}
+    <div className="space-y-8 pb-10">
+      {/* Header */}
+      <div 
+        className="relative -mx-6 -mt-8 overflow-hidden px-8 py-10 lg:-mx-10 lg:px-12"
+        style={{ background: headerBg }}
       >
-        <Link
-          href="/projects"
-          className="mb-6 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-soft)] transition-colors hover:text-[var(--color-grape)]"
-        >
-          <ChevronLeft size={14} />
-          Back to Projects
-        </Link>
-
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <div className="mb-2 flex items-center gap-3">
-              <span
-                className="h-4 w-4 rounded-full"
-                style={{ backgroundColor: projectColor }}
-                aria-hidden="true"
-              />
-              <h1 className="font-[family-name:var(--font-fraunces)] text-[var(--text-h1)] font-semibold text-[var(--color-ink)]">
-                {project.name}
-              </h1>
+        <div className="relative z-10 space-y-4">
+          <button 
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] transition-colors hover:text-[var(--color-ink)]"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+          
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-3">
+                <div 
+                  className="h-4 w-4 rounded-full" 
+                  style={{ backgroundColor: accentColor }} 
+                />
+                <h1 className="font-[family-name:var(--font-fraunces)] text-[var(--text-h1)] font-semibold text-[var(--color-ink)]">
+                  {project.name}
+                </h1>
+              </div>
+              <p className="mt-1 text-[var(--color-ink-soft)]">
+                Client: <span className="font-medium text-[var(--color-ink)]">{project.client || 'Internal'}</span> • 
+                Rate: <span className="font-medium text-[var(--color-ink)]">{formatCurrency(project.hourlyRate, project.currency)}/hr</span>
+              </p>
             </div>
-            <p className="text-sm text-[var(--color-ink-soft)]">{project.client || 'Internal Project'}</p>
-          </div>
-
-          <Badge tone={currencyTone(project.currency)} className="text-sm px-4 py-1.5">
-            {formatCurrency(project.hourlyRate, project.currency)}/hr
-          </Badge>
-        </div>
-
-        {/* Project stat chips inside hero */}
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="rounded-[var(--radius-md)] bg-white/50 px-5 py-3 backdrop-blur-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">Total Time</p>
-            <p className="mt-1 text-xl font-bold tabular-nums text-[var(--color-ink)]">{formatDuration(totalDuration)}</p>
-          </div>
-          <div className="rounded-[var(--radius-md)] px-5 py-3" style={{ background: `color-mix(in srgb, var(--color-lime) 25%, white)` }}>
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'color-mix(in srgb, var(--color-lime) 70%, #1B1A22)' }}>Paid</p>
-            <p className="mt-1 text-xl font-bold tabular-nums" style={{ color: 'color-mix(in srgb, var(--color-lime) 70%, #1B1A22)' }}>{formatCurrency(totalPaid, project.currency)}</p>
-          </div>
-          <div className="rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--color-tangerine)_15%,white)] px-5 py-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-tangerine)]">Pending</p>
-            <p className="mt-1 text-xl font-bold tabular-nums text-[var(--color-tangerine)]">{formatCurrency(totalPending, project.currency)}</p>
+            
+            <div className="flex gap-3">
+              <Button variant="secondary" size="sm" onClick={() => router.push('/projects')}>
+                Edit Project
+              </Button>
+            </div>
           </div>
         </div>
+        
+        {/* Decorative background element */}
+        <div 
+          className="absolute -right-20 -top-20 h-64 w-64 rounded-full blur-[80px] opacity-20"
+          style={{ background: accentColor }}
+        />
       </div>
 
-      {/* Content grid */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Sessions — main column */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">
-              Session History
-            </h2>
-            <span className="text-xs text-[var(--color-ink-soft)]">{projectSessions.length} sessions total</span>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <Card padding="md" className="flex items-center gap-4 border-l-4" style={{ borderLeftColor: accentColor }}>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-muted)] text-[var(--color-ink-soft)]">
+            <Clock size={20} />
           </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Total Time</p>
+            <p className="text-xl font-bold tabular-nums text-[var(--color-ink)]">{formatDuration(totalSeconds)}</p>
+          </div>
+        </Card>
+
+        <Card padding="md" className="flex items-center gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-muted)] text-[var(--color-grape)]">
+            <DollarSign size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Total Earnings</p>
+            <p className="text-xl font-bold tabular-nums text-[var(--color-ink)]">{formatCurrency(totalEarnings, project.currency)}</p>
+          </div>
+        </Card>
+
+        <Card padding="md" className="flex items-center gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-muted)] text-[var(--color-tangerine)]">
+            <BarChart3 size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Avg Session</p>
+            <p className="text-xl font-bold tabular-nums text-[var(--color-ink)]">{formatDuration(avgSessionSeconds)}</p>
+          </div>
+        </Card>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {/* Session List (2/3) */}
+        <div className="lg:col-span-2">
           <SessionList projectId={id} />
         </div>
 
-        {/* Sidebar: Resources + Settings */}
-        <div className="space-y-6">
-          <ResourcesSection projectId={id} resources={project.resources || []} />
-
-          <Card padding="md">
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Settings</h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">Hourly Rate</p>
-                <p className="font-bold text-[var(--color-ink)]">{formatCurrency(project.hourlyRate, project.currency)} / hr</p>
+        {/* Sidebar info (1/3) */}
+        <div className="space-y-8">
+          <ProjectResources projectId={id} />
+          
+          <Card padding="md" title="Project Details">
+            <div className="space-y-4 text-sm">
+              <div className="flex justify-between border-b border-[var(--color-line)] pb-2">
+                <span className="text-[var(--color-ink-soft)]">Created</span>
+                <span className="font-medium">{new Date(project.createdAt).toLocaleDateString()}</span>
               </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">Currency</p>
-                <p className="font-bold text-[var(--color-ink)]">{project.currency}</p>
+              <div className="flex justify-between border-b border-[var(--color-line)] pb-2">
+                <span className="text-[var(--color-ink-soft)]">Sessions</span>
+                <span className="font-medium">{sessions.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--color-ink-soft)]">Currency</span>
+                <span className="font-medium">{project.currency}</span>
               </div>
             </div>
           </Card>

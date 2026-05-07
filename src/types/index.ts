@@ -2,6 +2,8 @@ export interface Resource {
   id: string;
   label: string;
   url: string;
+  type: 'link' | 'file';
+  data?: string; // Para base64 de archivos pequeños
 }
 
 export interface Project {

@@ -98,7 +98,7 @@ export default function SessionList({ projectId, limit }: SessionListProps) {
       <div className="flex items-center justify-between border-b border-[var(--color-line)] px-6 py-4">
         <div>
           <h2 className="font-[family-name:var(--font-fraunces)] text-lg font-semibold text-[var(--color-ink)]">
-            Recent Sessions
+            {projectId ? 'Project History' : 'Recent Sessions'}
           </h2>
           <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
             {limit && filteredSessions.length > limit ? `Showing ${limit} of ${filteredSessions.length} sessions` : `${filteredSessions.length} session${filteredSessions.length !== 1 ? 's' : ''} found`}
