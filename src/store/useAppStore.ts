@@ -183,7 +183,7 @@ export const useAppStore = create<AppState>()(
 
         const now = new Date();
         const sessionSeconds = Math.floor(
-          (now.getTime() - activeTimer.startTime.getTime()) / 1000
+          (now.getTime() - new Date(activeTimer.startTime).getTime()) / 1000
         );
 
         set({
@@ -215,7 +215,7 @@ export const useAppStore = create<AppState>()(
         let sessionSeconds = 0;
         if (activeTimer.startTime) {
           sessionSeconds = Math.floor(
-            (now.getTime() - activeTimer.startTime.getTime()) / 1000
+            (now.getTime() - new Date(activeTimer.startTime).getTime()) / 1000
           );
         }
 
@@ -228,7 +228,7 @@ export const useAppStore = create<AppState>()(
         const newSession: Session = {
           id: uuidv4(),
           projectId: activeTimer.projectId,
-          startTime: activeTimer.startTime || now, // fallback if stopped while paused
+          startTime: activeTimer.startTime ? new Date(activeTimer.startTime) : now, // fallback if stopped while paused
           endTime: now,
           duration: totalDuration,
           description,
