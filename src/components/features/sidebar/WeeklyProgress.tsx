@@ -7,7 +7,7 @@ import { isThisWeek } from 'date-fns';
 
 export default function WeeklyProgress() {
   const sessions = useAppStore((s) => s.sessions);
-  const weeklyGoal = useAppStore((s) => s.weeklyGoal);
+  const weeklyGoal = useAppStore((s) => s.settings.weeklyGoal);
 
   const weekSeconds = sessions
     .filter((s) => isThisWeek(new Date(s.startTime), { weekStartsOn: 1 }))

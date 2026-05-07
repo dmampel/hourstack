@@ -66,6 +66,7 @@ interface AppState {
   projects: Project[];
   sessions: Session[];
   activeTimer: ActiveTimer | null;
+  settings: UserSettings;
 
   // Project actions
   addProject: (project: Omit<Project, 'id' | 'createdAt'>) => void;
@@ -90,7 +91,8 @@ interface AppState {
   removeAttachment: (sessionId: string, attachmentId: string) => void;
 
   // Settings actions
-  setWeeklyGoal: (goal: number) => void;
+  updateSettings: (updates: Partial<UserSettings>) => void;
+  resetStore: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -103,7 +105,11 @@ export const useAppStore = create<AppState>()(
       projects: [],
       sessions: [],
       activeTimer: null,
-      weeklyGoal: 40,
+      settings: {
+        name: 'Delfina',
+        weeklyGoal: 40,
+        defaultCurrency: 'USD',
+      },
 
       // --- Project actions ---------------------------------------------------
 
@@ -315,12 +321,21 @@ export const useAppStore = create<AppState>()(
         })),
 
       // --- Settings actions --------------------------------------------------
+      updateSettings: (updates) =>
+        set((state) => ({
+          settings: { ...state.settings, ...updates },
+        })),
 
-      setWeeklyGoal: (weeklyGoal) => set({ weeklyGoal }),
+      resetStore: () => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('hourstack-storage');
+          window.location.href = '/dashboard';
+        }
+      },
     }),
     {
       name: 'hourstack-storage',
-      version: 5,
+      version: 6,
       storage: createJSONStorage(() => storage),
       migrate: (persistedState: any, version: number) => {
         if (version < 2) {
@@ -350,6 +365,16 @@ export const useAppStore = create<AppState>()(
         if (version < 5) {
           if (persistedState.weeklyGoal === undefined) {
             persistedState.weeklyGoal = 40;
+          }
+        }
+        if (version < 6) {
+          if (!persistedState.settings) {
+            persistedState.settings = {
+              name: persistedState.name || 'Delfina',
+              weeklyGoal: persistedState.weeklyGoal || 40,
+              defaultCurrency: 'USD',
+            };
+            delete persistedState.weeklyGoal;
           }
         }
         return persistedState;

@@ -15,13 +15,15 @@ export default function DashboardPage() {
     });
   };
 
+  const name = useAppStore((state) => state.settings.name);
+
   return (
     <div className="space-y-6 pb-10">
       {/* Greeting & Actions */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-[family-name:var(--font-fraunces)] font-semibold text-[var(--color-ink)]" style={{ fontSize: 'var(--text-h1)' }}>
-            Welcome back, Delfina! 👋
+          <h1 className="font-[family-name:var(--font-fraunces)] font-semibold text-[var(--color-ink)]">
+            Welcome back, {name}! 👋
           </h1>
           <p className="mt-1 text-sm text-[var(--color-ink-soft)]">7 de mayo de 2026</p>
         </div>

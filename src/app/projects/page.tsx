@@ -21,7 +21,7 @@ export default function ProjectsPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <h1 className="font-[family-name:var(--font-fraunces)] text-[var(--text-h1)] font-semibold text-[var(--color-ink)]">
+        <h1 className="font-[family-name:var(--font-fraunces)] font-semibold text-[var(--color-ink)]">
           Projects
         </h1>
         {!formMode.open && (

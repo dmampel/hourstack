@@ -37,6 +37,12 @@ export interface Session {
   attachments?: Attachment[];
 }
 
+export interface UserSettings {
+  name: string;
+  weeklyGoal: number;
+  defaultCurrency: 'USD' | 'ARS';
+}
+
 export interface ActiveTimer {
   projectId: string;
   startTime: Date | null; // null means paused

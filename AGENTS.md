@@ -8,6 +8,16 @@ Regla de oro: **¿Esto infla mi contexto sin necesidad? → delegar.**
 
 ---
 
+## Configuración SDD (Siempre activa)
+
+| Parámetro | Valor |
+|-----------|-------|
+| Modo | **Interactive** (pausa para feedback entre fases) |
+| Artifact Store | **`openspec`** (file-based artifacts en el repo) |
+| Delivery Strategy | **`ask-on-risk`** (pedir permiso si > 400 líneas) |
+
+---
+
 ## Workflow OPSX
 
 ```

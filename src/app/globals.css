@@ -52,7 +52,21 @@
     font-size: var(--text-body);
   }
 
+  h1 {
+    font-size: var(--text-h1);
+  }
+
   h1, h2, h3 {
     font-family: var(--font-fraunces), Georgia, serif;
+  }
+
+  /* Hide number input arrows */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
   }
 }
