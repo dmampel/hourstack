@@ -5,6 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { formatCurrency } from '@/lib/utils';
 import { Project } from '@/types';
 import Badge, { currencyTone } from '@/components/ui/Badge';
+import StatusBadge from '@/components/ui/StatusBadge';
 
 interface ProjectListProps {
   onEdit: (project: Project) => void;
@@ -38,7 +39,12 @@ export default function ProjectList({ onEdit }: ProjectListProps) {
           >
             <Link href={`/projects/${project.id}`} className="absolute inset-0 rounded-[var(--radius-lg)]" aria-label={project.name} />
 
-            <div className="mb-3 h-3 w-3 rounded-full" style={{ backgroundColor: projectColor }} aria-hidden="true" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-3 w-3 rounded-full" style={{ backgroundColor: projectColor }} aria-hidden="true" />
+              <div className="relative z-10">
+                <StatusBadge status={project.status} />
+              </div>
+            </div>
 
             <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-semibold text-[var(--color-ink)] transition-colors group-hover:text-[var(--color-grape)] truncate">
               {project.name}

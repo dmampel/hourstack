@@ -8,6 +8,7 @@ import { formatDuration, formatCurrency } from '@/lib/utils';
 import SessionList from '@/components/features/sessions/SessionList';
 import ProjectResources from '@/components/features/projects/ProjectResources';
 import Button from '@/components/ui/Button';
+import StatusBadge from '@/components/ui/StatusBadge';
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -64,16 +65,20 @@ export default function ProjectDetailPage() {
                 <h1 className="font-[family-name:var(--font-fraunces)] text-[var(--text-h1)] font-semibold text-[var(--color-ink)]">
                   {project.name}
                 </h1>
+                <StatusBadge status={project.status} className="ml-2" />
               </div>
-              <p className="mt-2 flex items-center gap-3 text-xs tracking-wide">
+              <p className="mt-2 flex items-center gap-3 text-sm">
                 <span className="text-[var(--color-ink-soft)]">Client</span>
                 <span className="font-semibold text-[var(--color-ink)]">{project.client || 'Internal'}</span>
-                <span className="h-3 w-px bg-[var(--color-line)]" />
+                <span className="text-[var(--color-line)]">·</span>
                 <span className="text-[var(--color-ink-soft)]">Rate</span>
-                <span className="font-bold tabular-nums" style={{ color: accentColor }}>
-                  {formatCurrency(project.hourlyRate, project.currency)}/hr
-                </span>
+                <span className="font-semibold text-[var(--color-ink)]">{formatCurrency(project.hourlyRate, project.currency)}/hr</span>
               </p>
+              {project.description && (
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--color-ink-soft)] whitespace-pre-wrap">
+                  {project.description}
+                </p>
+              )}
             </div>
           </div>
 

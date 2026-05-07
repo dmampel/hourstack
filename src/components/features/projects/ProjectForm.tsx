@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { Project } from '@/types';
+import { Project, ProjectStatus } from '@/types';
+import { ChevronDown } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 const COLOR_SWATCHES = [
@@ -39,6 +40,8 @@ export default function ProjectForm({ project, onSubmit, onCancel }: ProjectForm
   );
   const [currency, setCurrency] = useState<'ARS' | 'USD'>(project?.currency ?? 'ARS');
   const [color, setColor] = useState(project?.color ?? '#7C5CFF');
+  const [status, setStatus] = useState<ProjectStatus>(project?.status ?? 'just-started');
+  const [description, setDescription] = useState(project?.description ?? '');
 
   useEffect(() => {
     setName(project?.name ?? '');
@@ -46,6 +49,8 @@ export default function ProjectForm({ project, onSubmit, onCancel }: ProjectForm
     setHourlyRate(project?.hourlyRate !== undefined ? String(project.hourlyRate) : '');
     setCurrency(project?.currency ?? 'ARS');
     setColor(project?.color ?? '#7C5CFF');
+    setStatus(project?.status ?? 'just-started');
+    setDescription(project?.description ?? '');
   }, [project]);
 
   function handleSubmit(e: React.FormEvent) {
@@ -60,6 +65,8 @@ export default function ProjectForm({ project, onSubmit, onCancel }: ProjectForm
         hourlyRate: parsedRate,
         currency,
         color,
+        status,
+        description: description.trim(),
       });
     } else {
       addProject({
@@ -68,6 +75,8 @@ export default function ProjectForm({ project, onSubmit, onCancel }: ProjectForm
         hourlyRate: parsedRate,
         currency,
         color,
+        status,
+        description: description.trim(),
       });
     }
     onSubmit();
@@ -133,16 +142,58 @@ export default function ProjectForm({ project, onSubmit, onCancel }: ProjectForm
           <label htmlFor="currency" className="block text-sm font-medium text-[var(--color-ink)]">
             Currency <span className="text-red-500">*</span>
           </label>
-          <select
-            id="currency"
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value as 'ARS' | 'USD')}
-            className={inputClass}
-          >
-            <option value="ARS">ARS (Pesos)</option>
-            <option value="USD">USD (Dólares)</option>
-          </select>
+          <div className="relative">
+            <select
+              id="currency"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as 'ARS' | 'USD')}
+              className={`${inputClass} appearance-none pr-10`}
+            >
+              <option value="ARS">ARS (Pesos)</option>
+              <option value="USD">USD (Dólares)</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-ink-soft)] pointer-events-none" />
+          </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label htmlFor="status" className="block text-sm font-medium text-[var(--color-ink)]">
+            Status <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ProjectStatus)}
+              className={`${inputClass} appearance-none pr-10`}
+              required
+            >
+              <option value="just-started">Just Started</option>
+              <option value="in-progress">In Progress</option>
+              <option value="mvp">MVP Phase</option>
+              <option value="polishing">Polishing</option>
+              <option value="almost-done">Almost Done</option>
+              <option value="completed">Completed</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-ink-soft)] pointer-events-none" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label htmlFor="description" className="block text-sm font-medium text-[var(--color-ink)]">
+          Description
+        </label>
+        <textarea
+          id="description"
+          rows={3}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Briefly describe the project goals or context..."
+          className={`${inputClass} resize-none`}
+        />
       </div>
 
       {/* Color picker — 40px circles */}

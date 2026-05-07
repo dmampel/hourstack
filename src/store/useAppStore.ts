@@ -120,6 +120,7 @@ export const useAppStore = create<AppState>()(
             {
               ...projectData,
               id: uuidv4(),
+              status: 'just-started',
               createdAt: new Date(),
             },
           ],
