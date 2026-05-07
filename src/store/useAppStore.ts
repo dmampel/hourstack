@@ -79,6 +79,7 @@ interface AppState {
   pauseTimer: () => void;
   resumeTimer: () => void;
   stopTimer: (description?: string) => void;
+  resetTimer: () => void;
 
   // Session actions
   updateSession: (id: string, updates: Partial<Session>) => void;
@@ -87,6 +88,9 @@ interface AppState {
   deleteSession: (id: string) => void;
   addAttachment: (sessionId: string, attachment: Omit<Attachment, 'id'>) => void;
   removeAttachment: (sessionId: string, attachmentId: string) => void;
+
+  // Settings actions
+  setWeeklyGoal: (goal: number) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -99,6 +103,7 @@ export const useAppStore = create<AppState>()(
       projects: [],
       sessions: [],
       activeTimer: null,
+      weeklyGoal: 40,
 
       // --- Project actions ---------------------------------------------------
 
@@ -231,6 +236,18 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
+      resetTimer: () => {
+        const { activeTimer } = get();
+        if (!activeTimer) return;
+        set({
+          activeTimer: {
+            ...activeTimer,
+            startTime: activeTimer.startTime ? new Date() : null,
+            elapsedTime: 0,
+          },
+        });
+      },
+
       // --- Session actions --------------------------------------------------
 
       updateSession: (id, updates) =>
@@ -296,10 +313,14 @@ export const useAppStore = create<AppState>()(
               : s
           ),
         })),
+
+      // --- Settings actions --------------------------------------------------
+
+      setWeeklyGoal: (weeklyGoal) => set({ weeklyGoal }),
     }),
     {
       name: 'hourstack-storage',
-      version: 4,
+      version: 5,
       storage: createJSONStorage(() => storage),
       migrate: (persistedState: any, version: number) => {
         if (version < 2) {
@@ -324,6 +345,11 @@ export const useAppStore = create<AppState>()(
               ...s,
               isPaid: s.isPaid ?? false,
             }));
+          }
+        }
+        if (version < 5) {
+          if (persistedState.weeklyGoal === undefined) {
+            persistedState.weeklyGoal = 40;
           }
         }
         return persistedState;

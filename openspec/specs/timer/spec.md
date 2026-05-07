@@ -35,8 +35,22 @@ The system MUST allow starting and stopping the timer. When stopped, the timer M
 - WHEN the user selects a project and clicks "Start"
 - THEN an active timer MUST be created with the current timestamp
 
-#### Scenario: Stop and Stop Accumulating
+#### Scenario: Finish Session
 - GIVEN an active timer
-- WHEN the user clicks "Stop"
+- WHEN the user clicks "Finish"
 - THEN the timer MUST stop incrementing immediately
 - AND the system MUST prompt for a description to save the session
+
+### Requirement: Reset Timer
+The system MUST allow resetting an active or paused timer to zero without saving a session.
+
+#### Scenario: Reset Timer
+- GIVEN an active or paused timer
+- WHEN the user clicks the "Reset" (RotateCcw) icon
+- THEN the `elapsedTime` MUST be set to 0
+- AND the `startTime` MUST be reset to the current time (if active) or null (if paused)
+
+### Requirement: Decoupled UI
+The Timer UI MUST separate the visual time display (Card) from the interaction controls (Buttons) to improve visual clarity.
+- The Card MUST focus exclusively on displaying the current duration and active project.
+- The Controls MUST be positioned outside the card and provide clear actions for Start, Pause/Resume, Finish, and Reset.

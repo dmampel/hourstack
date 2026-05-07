@@ -27,9 +27,10 @@ function parseDuration(val: string): number {
 
 interface SessionListProps {
   projectId?: string;
+  limit?: number;
 }
 
-export default function SessionList({ projectId }: SessionListProps) {
+export default function SessionList({ projectId, limit }: SessionListProps) {
   const projects = useAppStore((state) => state.projects);
   const sessions = useAppStore((state) => state.sessions);
   const updateSession = useAppStore((state) => state.updateSession);
@@ -54,8 +55,8 @@ export default function SessionList({ projectId }: SessionListProps) {
   const recent = useMemo(() =>
     [...filteredSessions]
       .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
-      .slice(0, MAX_SESSIONS),
-    [filteredSessions]
+      .slice(0, limit || MAX_SESSIONS),
+    [filteredSessions, limit]
   );
 
   const toggleSelect = (id: string) => {
@@ -100,7 +101,7 @@ export default function SessionList({ projectId }: SessionListProps) {
             Recent Sessions
           </h2>
           <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
-            {recent.length} session{recent.length !== 1 ? 's' : ''} found
+            {limit && filteredSessions.length > limit ? `Showing ${limit} of ${filteredSessions.length} sessions` : `${filteredSessions.length} session${filteredSessions.length !== 1 ? 's' : ''} found`}
           </p>
         </div>
 
@@ -274,6 +275,18 @@ export default function SessionList({ projectId }: SessionListProps) {
             );
           })}
         </ul>
+      )}
+
+      {limit && filteredSessions.length > limit && (
+        <div className="border-t border-[var(--color-line)] p-4 text-center">
+          <Link
+            href="/sessions"
+            className="group inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-grape)] transition-colors hover:text-[var(--color-ink)]"
+          >
+            View all sessions
+            <span className="transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+        </div>
       )}
 
       {/* Floating Bulk Action Bar */}

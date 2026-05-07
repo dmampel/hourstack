@@ -22,7 +22,7 @@ export function exportSessionsToCSV(
       Date: format(new Date(session.startTime), 'yyyy-MM-dd'),
       'Duration (h)': durationHours.toFixed(2),
       Description: session.description,
-      Earnings: session.earnings.toFixed(2),
+      Earnings: `${project?.currency ?? 'USD'} ${session.earnings.toFixed(2)}`,
     };
   });
 

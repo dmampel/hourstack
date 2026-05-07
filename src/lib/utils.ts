@@ -17,7 +17,7 @@ export function formatDuration(seconds: number): string {
 
 /**
  * Calculates earnings based on duration and hourly rate.
- * @param duration - Duration in minutes
+ * @param durationSeconds - Duration in seconds
  * @param hourlyRate - Rate in currency per hour
  */
 export function calculateEarnings(durationSeconds: number, hourlyRate: number): number {
