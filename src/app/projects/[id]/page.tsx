@@ -1,14 +1,13 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { Clock, DollarSign, BarChart3, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Clock, DollarSign, BarChart3, ArrowLeft, Pencil } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store/useAppStore';
 import { formatDuration, formatCurrency } from '@/lib/utils';
 import SessionList from '@/components/features/sessions/SessionList';
 import ProjectResources from '@/components/features/projects/ProjectResources';
 import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -38,83 +37,129 @@ export default function ProjectDetailPage() {
   const headerBg = `color-mix(in srgb, ${accentColor} 8%, var(--color-canvas))`;
 
   return (
-    <div className="space-y-8 pb-10">
-      {/* Header */}
-      <div 
-        className="relative -mx-6 -mt-8 overflow-hidden px-8 py-10 lg:-mx-10 lg:px-12"
-        style={{ background: headerBg }}
-      >
-        <div className="relative z-10 space-y-4">
-          <button 
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] transition-colors hover:text-[var(--color-ink)]"
-          >
-            <ArrowLeft size={14} /> Back
-          </button>
-          
-          <div className="flex flex-wrap items-end justify-between gap-6">
+    <div>
+      {/* Hero wrapper — relative so the dropdown can position against its bottom edge */}
+      <div className="relative">
+
+        {/* Hero — full width */}
+        <div
+          className="relative overflow-hidden px-6 pb-16 pt-10 md:px-12 lg:px-16"
+          style={{ background: headerBg }}
+        >
+          {/* Back + title + client/rate */}
+          <div className="relative z-10 space-y-4">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--color-ink-soft)] transition-colors hover:text-[var(--color-ink)]"
+            >
+              <ArrowLeft size={14} /> Back
+            </button>
+
             <div>
               <div className="flex items-center gap-3">
-                <div 
-                  className="h-4 w-4 rounded-full" 
-                  style={{ backgroundColor: accentColor }} 
+                <div
+                  className="h-4 w-4 shrink-0 rounded-full"
+                  style={{ backgroundColor: accentColor }}
                 />
                 <h1 className="font-[family-name:var(--font-fraunces)] text-[var(--text-h1)] font-semibold text-[var(--color-ink)]">
                   {project.name}
                 </h1>
               </div>
-              <p className="mt-1 text-[var(--color-ink-soft)]">
-                Client: <span className="font-medium text-[var(--color-ink)]">{project.client || 'Internal'}</span> • 
-                Rate: <span className="font-medium text-[var(--color-ink)]">{formatCurrency(project.hourlyRate, project.currency)}/hr</span>
+              <p className="mt-2 flex items-center gap-3 text-xs tracking-wide">
+                <span className="text-[var(--color-ink-soft)]">Client</span>
+                <span className="font-semibold text-[var(--color-ink)]">{project.client || 'Internal'}</span>
+                <span className="h-3 w-px bg-[var(--color-line)]" />
+                <span className="text-[var(--color-ink-soft)]">Rate</span>
+                <span className="font-bold tabular-nums" style={{ color: accentColor }}>
+                  {formatCurrency(project.hourlyRate, project.currency)}/hr
+                </span>
               </p>
             </div>
-            
-            <div className="flex gap-3">
-              <Button variant="secondary" size="sm" onClick={() => router.push('/projects')}>
-                Edit Project
-              </Button>
+          </div>
+
+          {/* Edit — top right */}
+          <button
+            onClick={() => router.push('/projects')}
+            className="absolute right-6 top-6 z-10 flex items-center gap-1.5 rounded-full border border-white/50 bg-white/40 px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] backdrop-blur-sm transition-all hover:bg-white/70"
+          >
+            <Pencil size={11} />
+            Edit
+          </button>
+
+          {/* Decorative blur */}
+          <div
+            className="absolute -right-20 -top-20 h-64 w-64 rounded-full blur-[80px] opacity-20"
+            style={{ background: accentColor }}
+          />
+        </div>
+
+        {/* Glass metadata card — small, right-aligned, straddling hero bottom */}
+        <div className="absolute bottom-0 right-12 z-30 hidden translate-y-1/2 lg:block">
+          <div className="flex items-stretch divide-x divide-[var(--color-line)]/30 overflow-hidden rounded-xl border border-white/50 bg-white/70 shadow-lg backdrop-blur-lg">
+            <div className="px-4 py-2.5 text-center">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Created</p>
+              <p className="mt-0.5 whitespace-nowrap text-xs font-semibold text-[var(--color-ink)]">
+                {new Date(project.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </p>
+            </div>
+            <div className="px-4 py-2.5 text-center">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Sessions</p>
+              <p className="mt-0.5 text-xs font-semibold text-[var(--color-ink)]">{sessions.length}</p>
+            </div>
+            <div className="px-4 py-2.5 text-center">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Currency</p>
+              <p className="mt-0.5 text-xs font-semibold text-[var(--color-ink)]">{project.currency}</p>
             </div>
           </div>
         </div>
-        
-        {/* Decorative background element */}
-        <div 
-          className="absolute -right-20 -top-20 h-64 w-64 rounded-full blur-[80px] opacity-20"
-          style={{ background: accentColor }}
-        />
+
       </div>
 
+      {/* Constrained content — pt accounts for the card overlapping from above */}
+      <div className="mx-auto max-w-[960px] space-y-8 px-6 pt-16 pb-10 md:px-8">
+
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <Card padding="md" className="flex items-center gap-4 border-l-4" style={{ borderLeftColor: accentColor }}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-muted)] text-[var(--color-ink-soft)]">
-            <Clock size={20} />
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Total Time</p>
-            <p className="text-xl font-bold tabular-nums text-[var(--color-ink)]">{formatDuration(totalSeconds)}</p>
-          </div>
-        </Card>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 
-        <Card padding="md" className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-muted)] text-[var(--color-grape)]">
-            <DollarSign size={20} />
+        {/* Total Time */}
+        <div
+          className="group relative overflow-hidden rounded-2xl p-6 transition-transform duration-200 hover:-translate-y-0.5"
+          style={{ background: `linear-gradient(135deg, color-mix(in srgb, ${accentColor} 14%, var(--color-surface)), var(--color-surface) 70%)` }}
+        >
+          <div className="absolute -right-5 -top-5 h-20 w-20 rounded-full blur-2xl transition-transform duration-300 group-hover:scale-110" style={{ background: accentColor, opacity: 0.25 }} />
+          <div className="relative z-10 flex h-full flex-col">
+            <Clock size={14} className="mb-4 opacity-40" style={{ color: accentColor }} />
+            <p className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-none tabular-nums tracking-tight" style={{ color: accentColor }}>
+              {formatDuration(totalSeconds)}
+            </p>
+            <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Total Time</p>
           </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Total Earnings</p>
-            <p className="text-xl font-bold tabular-nums text-[var(--color-ink)]">{formatCurrency(totalEarnings, project.currency)}</p>
-          </div>
-        </Card>
+        </div>
 
-        <Card padding="md" className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-muted)] text-[var(--color-tangerine)]">
-            <BarChart3 size={20} />
+        {/* Total Earnings */}
+        <div className="group relative overflow-hidden rounded-2xl bg-[color-mix(in_srgb,var(--color-grape)_14%,var(--color-surface))] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-grape)_14%,var(--color-surface))] to-[var(--color-surface)] p-6 transition-transform duration-200 hover:-translate-y-0.5">
+          <div className="absolute -right-5 -top-5 h-20 w-20 rounded-full bg-[var(--color-grape)] blur-2xl opacity-25 transition-transform duration-300 group-hover:scale-110" />
+          <div className="relative z-10 flex h-full flex-col">
+            <DollarSign size={14} className="mb-4 text-[var(--color-grape)] opacity-40" />
+            <p className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-none tabular-nums tracking-tight text-[var(--color-grape)]">
+              {formatCurrency(totalEarnings, project.currency)}
+            </p>
+            <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Total Earnings</p>
           </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Avg Session</p>
-            <p className="text-xl font-bold tabular-nums text-[var(--color-ink)]">{formatDuration(avgSessionSeconds)}</p>
+        </div>
+
+        {/* Avg Session */}
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[color-mix(in_srgb,var(--color-tangerine)_14%,var(--color-surface))] to-[var(--color-surface)] p-6 transition-transform duration-200 hover:-translate-y-0.5">
+          <div className="absolute -right-5 -top-5 h-20 w-20 rounded-full bg-[var(--color-tangerine)] blur-2xl opacity-25 transition-transform duration-300 group-hover:scale-110" />
+          <div className="relative z-10 flex h-full flex-col">
+            <BarChart3 size={14} className="mb-4 text-[var(--color-tangerine)] opacity-40" />
+            <p className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-none tabular-nums tracking-tight text-[var(--color-tangerine)]">
+              {formatDuration(avgSessionSeconds)}
+            </p>
+            <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Avg Session</p>
           </div>
-        </Card>
+        </div>
+
       </div>
 
       {/* Main Content */}
@@ -127,25 +172,10 @@ export default function ProjectDetailPage() {
         {/* Sidebar info (1/3) */}
         <div className="space-y-8">
           <ProjectResources projectId={id} />
-          
-          <Card padding="md" title="Project Details">
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between border-b border-[var(--color-line)] pb-2">
-                <span className="text-[var(--color-ink-soft)]">Created</span>
-                <span className="font-medium">{new Date(project.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div className="flex justify-between border-b border-[var(--color-line)] pb-2">
-                <span className="text-[var(--color-ink-soft)]">Sessions</span>
-                <span className="font-medium">{sessions.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[var(--color-ink-soft)]">Currency</span>
-                <span className="font-medium">{project.currency}</span>
-              </div>
-            </div>
-          </Card>
         </div>
       </div>
+
+      </div> {/* end constrained content */}
     </div>
   );
 }

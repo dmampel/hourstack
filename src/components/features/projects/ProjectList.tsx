@@ -29,41 +29,30 @@ export default function ProjectList({ onEdit }: ProjectListProps) {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => {
         const projectColor = project.color || '#7C5CFF';
+
         return (
           <div
             key={project.id}
             className="group relative rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-soft)] transition-all duration-200 hover:shadow-[var(--shadow-pop)] hover:-translate-y-0.5"
-            style={{
-              background: `color-mix(in srgb, ${projectColor} 14%, var(--color-surface))`,
-            }}
+            style={{ background: `color-mix(in srgb, ${projectColor} 14%, var(--color-surface))` }}
           >
-            {/* Project link — covers the tile */}
             <Link href={`/projects/${project.id}`} className="absolute inset-0 rounded-[var(--radius-lg)]" aria-label={project.name} />
 
-            {/* Color dot */}
-            <div
-              className="mb-3 h-3 w-3 rounded-full"
-              style={{ backgroundColor: projectColor }}
-              aria-hidden="true"
-            />
+            <div className="mb-3 h-3 w-3 rounded-full" style={{ backgroundColor: projectColor }} aria-hidden="true" />
 
-            {/* Name */}
-            <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-semibold text-[var(--color-ink)] group-hover:text-[var(--color-grape)] transition-colors truncate">
+            <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-semibold text-[var(--color-ink)] transition-colors group-hover:text-[var(--color-grape)] truncate">
               {project.name}
             </h3>
-
             {project.client && (
               <p className="mt-0.5 text-sm text-[var(--color-ink-soft)] truncate">{project.client}</p>
             )}
 
-            {/* Rate badge */}
             <div className="mt-4 flex items-center justify-between gap-2">
               <Badge tone={currencyTone(project.currency)}>
                 {formatCurrency(project.hourlyRate, project.currency)}/hr
               </Badge>
 
-              {/* Edit / Delete — above the link overlay */}
-              <div className="relative z-10 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="relative z-10 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                 <button
                   onClick={(e) => { e.preventDefault(); onEdit(project); }}
                   className="rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium text-[var(--color-ink-soft)] transition-colors hover:bg-white/60 hover:text-[var(--color-ink)]"

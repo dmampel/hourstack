@@ -63,25 +63,25 @@ function MiniStats() {
   const todaySeconds = todaySessions.reduce((sum, s) => sum + s.duration, 0);
   const todayEarnings = todaySessions.reduce((sum, s) => sum + s.earnings, 0);
 
-  const pendingTotal = sessions
-    .filter((s) => !s.isPaid)
-    .reduce((sum, s) => sum + s.earnings, 0);
-
   const currency = projects[0]?.currency ?? 'USD';
 
   return (
     <div className="space-y-2 px-4 pb-4">
       <p className="px-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Today</p>
       <div className="flex gap-2">
-        <div className="flex flex-1 flex-col gap-0.5 rounded-[var(--radius-md)] p-3" style={{ background: 'color-mix(in srgb, var(--color-grape) 10%, white)' }}>
-          <Clock size={14} style={{ color: 'var(--color-grape)' }} />
-          <span className="mt-1 text-base font-semibold tabular-nums text-[var(--color-ink)]">{formatDuration(todaySeconds)}</span>
-          <span className="text-[10px] text-[var(--color-ink-soft)]">Time tracked</span>
+        <div className="flex flex-1 flex-col rounded-lg p-3" style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-sky) 14%, var(--color-surface)), var(--color-surface) 70%)' }}>
+          <div className="flex flex-col gap-0.5">
+            <Clock size={13} className="opacity-40" style={{ color: 'var(--color-sky)' }} />
+            <span className="mt-1 font-[family-name:var(--font-fraunces)] text-base font-semibold tabular-nums" style={{ color: 'var(--color-sky)' }}>{formatDuration(todaySeconds)}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Time tracked</span>
+          </div>
         </div>
-        <div className="flex flex-1 flex-col gap-0.5 rounded-[var(--radius-md)] p-3" style={{ background: 'color-mix(in srgb, var(--color-tangerine) 10%, white)' }}>
-          <DollarSign size={14} style={{ color: 'var(--color-tangerine)' }} />
-          <span className="mt-1 text-base font-semibold tabular-nums text-[var(--color-ink)]">{formatCurrency(todayEarnings, currency)}</span>
-          <span className="text-[10px] text-[var(--color-ink-soft)]">Earned</span>
+        <div className="flex flex-1 flex-col rounded-lg p-3" style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-lime) 34%, var(--color-surface)), var(--color-surface) 70%)' }}>
+          <div className="flex flex-col gap-0.5">
+            <DollarSign size={13} className="opacity-40" style={{ color: 'var(--color-lime)' }} />
+            <span className="mt-1 font-[family-name:var(--font-fraunces)] text-base font-semibold tabular-nums" style={{ color: 'var(--color-lime)' }}>{formatCurrency(todayEarnings, currency)}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">Earned</span>
+          </div>
         </div>
       </div>
     </div>

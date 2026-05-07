@@ -16,15 +16,7 @@ interface ChipCardProps {
   className?: string;
 }
 
-function ChipCard({
-  label,
-  value,
-  icon,
-  accentVar,
-  extra,
-  variant = "default",
-  className = "",
-}: ChipCardProps) {
+function ChipCard({ label, value, icon, accentVar, extra, variant = "default", className = "" }: ChipCardProps) {
   const bg = `color-mix(in srgb, ${accentVar} 12%, var(--color-surface))`;
   const iconBg = `color-mix(in srgb, ${accentVar} 20%, var(--color-surface))`;
 
@@ -34,19 +26,12 @@ function ChipCard({
         className={`flex items-center gap-4 rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-soft)] transition-transform hover:scale-[1.01] ${className}`}
         style={{ background: bg }}
       >
-        <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)]"
-          style={{ background: iconBg, color: accentVar }}
-        >
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)]" style={{ background: iconBg, color: accentVar }}>
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-ink-soft)]">
-            {label}
-          </p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--color-ink)] leading-tight truncate">
-            {value}
-          </p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-ink-soft)]">{label}</p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--color-ink)] leading-tight truncate">{value}</p>
         </div>
       </div>
     );
@@ -59,23 +44,14 @@ function ChipCard({
         style={{ background: bg }}
       >
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)]"
-            style={{ background: iconBg, color: accentVar }}
-          >
+          <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)]" style={{ background: iconBg, color: accentVar }}>
             {icon}
           </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">
-            {label}
-          </p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">{label}</p>
         </div>
         <div>
-          <p className="text-lg font-bold tabular-nums text-[var(--color-ink)] leading-tight truncate">
-            {value}
-          </p>
-          <div className="mt-1 border-t border-[color-mix(in_srgb,black_5%,transparent)] pt-1">
-            {extra}
-          </div>
+          <p className="text-lg font-bold tabular-nums text-[var(--color-ink)] leading-tight truncate">{value}</p>
+          <div className="mt-1 border-t border-[color-mix(in_srgb,black_5%,transparent)] pt-1">{extra}</div>
         </div>
       </div>
     );
@@ -83,22 +59,16 @@ function ChipCard({
 
   return (
     <div
-      className={`flex flex-col gap-3 rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-soft)] ${className}`}
-      style={{ background: bg }}
+      className={`group relative overflow-hidden rounded-2xl p-6 transition-transform duration-200 hover:-translate-y-0.5 ${className}`}
+      style={{ background: `linear-gradient(135deg, color-mix(in srgb, ${accentVar} 14%, var(--color-surface)), var(--color-surface) 70%)` }}
     >
-      <div
-        className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)]"
-        style={{ background: iconBg, color: accentVar }}
-      >
-        {icon}
-      </div>
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-soft)]">
-          {label}
-        </p>
-        <p className="mt-1 text-xl font-semibold tabular-nums text-[var(--color-ink)] leading-tight truncate">
+      <div className="absolute -right-5 -top-5 h-20 w-20 rounded-full blur-2xl transition-transform duration-300 group-hover:scale-110" style={{ background: accentVar, opacity: 0.25 }} />
+      <div className="relative z-10 flex h-full flex-col">
+        <div className="mb-4 opacity-40" style={{ color: accentVar }}>{icon}</div>
+        <p className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold leading-tight tabular-nums tracking-tight line-clamp-2" style={{ color: accentVar }}>
           {value}
         </p>
+        <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-ink-soft)]">{label}</p>
       </div>
     </div>
   );

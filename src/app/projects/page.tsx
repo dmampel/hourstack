@@ -18,7 +18,7 @@ export default function ProjectsPage() {
   function closeForm() { setFormMode({ open: false }); }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-[960px] space-y-8 px-6 pt-8 pb-10 md:px-8">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <h1 className="font-[family-name:var(--font-fraunces)] font-semibold text-[var(--color-ink)]">

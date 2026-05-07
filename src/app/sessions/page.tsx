@@ -4,7 +4,7 @@ import SessionList from '@/components/features/sessions/SessionList';
 
 export default function SessionsPage() {
   return (
-    <div className="mx-auto max-w-7xl space-y-8">
+    <div className="mx-auto max-w-[960px] space-y-8 px-6 pt-8 pb-10 md:px-8">
       <header>
         <h1 className="font-[family-name:var(--font-fraunces)] font-semibold text-[var(--color-ink)]">
           All Sessions

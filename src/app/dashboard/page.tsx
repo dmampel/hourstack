@@ -18,7 +18,7 @@ export default function DashboardPage() {
   const name = useAppStore((state) => state.settings.name);
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="mx-auto max-w-[960px] space-y-6 px-6 pt-8 pb-10 md:px-8">
       {/* Greeting & Actions */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>

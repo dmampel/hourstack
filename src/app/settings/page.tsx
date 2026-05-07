@@ -50,7 +50,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-8 px-6 pt-8 pb-10 md:px-8">
       <div>
         <h1 className="font-[family-name:var(--font-fraunces)] font-semibold text-[var(--color-ink)]">
           Settings
